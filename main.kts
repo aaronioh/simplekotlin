@@ -3,14 +3,109 @@
 println("UW Homework: Simple Kotlin")
 
 // write a "whenFn" that takes an arg of type "Any" and returns a String
+fun whenFn(x: Any) : String {
+    when (x) {
+        "Hello" -> return "world"
+        is String -> return "Say what?"
+        0 -> return "zero"
+        1 -> return "one"
+        in 2..10 -> return "low number"
+        is Int -> return "a number"
+        else -> {
+            return "I don't understand"
+        }
+    }
+}
 
 // write an "add" function that takes two Ints, returns an Int, and adds the values
+fun add(x: Int, y: Int) : Int {
+    return x + y
+}
 // write a "sub" function that takes two Ints, returns an Int, and subtracts the values
+fun sub(x: Int, y: Int) : Int {
+    return x - y
+}
 // write a "mathOp" function that takes two Ints and a function (that takes two Ints and returns an Int), returns an Int, and applies the passed-in-function to the arguments
+fun mathOp(x: Int, y: Int, f: (n: Int, m: Int) -> Int) : Int {
+    return f(x, y)
+}
 
 // write a class "Person" with first name, last name and age
+class Person (val firstName: String, val lastName: String, var age: Int) {
+    var debugString: String = ""
+        get() = "[Person firstName:" + firstName + " lastName:" + lastName + " age:" + age + "]"
+
+    fun equals(other: Person) : Boolean {
+        if (this.firstName == other.firstName && this.lastName == other.lastName && this.age == other.age) {
+            return true
+        }
+        return false;
+    }
+
+    override fun hashCode() : Int {
+        var hash = 17
+        hash *= 31 + firstName.hashCode()
+        hash *= 31 + lastName.hashCode()
+        hash *= 31 + age
+        return hash;
+    }
+}
 
 // write a class "Money"
+class Money (var amount: Int, var currency: String) {
+    // Currencies: 'USD', 'EUR', 'CAN', 'GBP'
+    // currency = if(currency != "USD" || currency != "EUR" || currency != "CAN" || currency != "GBP") /* does not match any of four ? */ else currency
+    // amount can never be less than zero
+    //amount = if (amount < 0) 0 else amount
+
+    init {
+        if (amount < 0 || (currency != "USD" && currency != "EUR" && currency != "CAN" && currency != "GBP")) {
+            throw IllegalArgumentException()
+        }
+    }
+    /*
+     * 10 USD = 5 GBP
+     * 10 USD = 15 EUR
+     * 12 USD = 15 CAN
+     */
+    fun convert(c: String) : Money {
+        if (this.currency == "USD") {
+            when (c) {
+                "GBP" -> return Money(this.amount / 2, "GBP")
+                "EUR" -> return Money((this.amount * 1.5).toInt(), "EUR")
+                "CAN" -> return Money((this.amount * 5/4).toInt(), "CAN")
+            }
+        } else if (this.currency == "EUR") {
+            when (c) {
+                "USD" -> return Money((this.amount * 2/3).toInt(), "USD")
+                "GBP" -> return Money(this.amount / 3, "GBP")
+                "CAN" -> return Money(this.amount * 5/6, "CAN")
+            }
+        } else if (this.currency == "CAN") {
+            when (c) {
+                "USD" -> return Money(this.amount * 5/4, "USD")
+                "GBP" -> return Money(this.amount * 2/5, "GBP")
+                "EUR" -> return Money(this.amount * 6/5, "EUR")
+            }
+        } else { // "GBP"
+            when (c) {
+                "USD" -> return Money(this.amount * 2, "USD")
+                "EUR" -> return Money(this.amount * 3, "EUR")
+                "CAN" -> return Money(this.amount * 5/2, "CAN")
+            }
+        }
+        // will not reach here, just to compile
+        return Money(amount, currency)
+    }
+
+    // '+' operator, always converts to left-hand currency
+    operator fun plus(other: Money) : Money {
+        if (this.currency != other.currency) {
+            return Money(this.amount + other.convert(this.currency).amount, this.currency);
+        }
+        return Money(this.amount + other.amount, this.currency)
+    }
+}
 
 // ============ DO NOT EDIT BELOW THIS LINE =============
 
@@ -86,6 +181,7 @@ val convert_tests = listOf(
 for ( (from,to) in convert_tests) {
     print(if (from.convert(to.currency).amount == to.amount) "." else "!")
 }
+
 val moneyadd_tests = listOf(
     Pair(tenUSD, tenUSD) to Money(20, "USD"),
     Pair(tenUSD, fiveGBP) to Money(20, "USD"),
