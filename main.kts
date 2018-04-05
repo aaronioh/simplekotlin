@@ -32,6 +32,7 @@ fun mathOp(x: Int, y: Int, f: (n: Int, m: Int) -> Int) : Int {
 
 // write a class "Person" with first name, last name and age
 class Person (val firstName: String, val lastName: String, var age: Int) {
+    // get() so that if age is updated after Person is created, it has the updated value
     var debugString: String = ""
         get() = "[Person firstName:" + firstName + " lastName:" + lastName + " age:" + age + "]"
 
@@ -54,15 +55,13 @@ class Person (val firstName: String, val lastName: String, var age: Int) {
 // write a class "Money"
 class Money (var amount: Int, var currency: String) {
     // Currencies: 'USD', 'EUR', 'CAN', 'GBP'
-    // currency = if(currency != "USD" || currency != "EUR" || currency != "CAN" || currency != "GBP") /* does not match any of four ? */ else currency
     // amount can never be less than zero
-    //amount = if (amount < 0) 0 else amount
-
     init {
         if (amount < 0 || (currency != "USD" && currency != "EUR" && currency != "CAN" && currency != "GBP")) {
             throw IllegalArgumentException()
         }
     }
+
     /*
      * 10 USD = 5 GBP
      * 10 USD = 15 EUR
